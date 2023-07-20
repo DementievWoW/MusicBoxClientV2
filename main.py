@@ -1,16 +1,21 @@
-# This is a sample Python script.
+import json
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import psutil
+import platform
+from datetime import datetime
+
+import requests as requests
+from MachineState import MachineState
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+data = {
+    "machineState": []
+}
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+data['machineState'].append(MachineState().__dict__)
+
+data_json = json.dumps(data)
+payload = {'json_payload': data_json}
+r = requests.post("http://127.0.0.1:8000/api/v1/device", data=payload)
