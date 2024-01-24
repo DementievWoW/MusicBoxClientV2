@@ -1,16 +1,72 @@
-# This is a sample Python script.
+import json
+import websockets
+import asyncio
+import uuid
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from fileHandler import readRuntimeLogs, readStartLogs
+
+password = 'qwer'
+UUID = str(uuid.UUID(int=uuid.getnode()))
+url = "ws://localhost:8000/ws/?password=" + password + "&UUID=" + UUID
+from MachineState import MachineState
+
+pathStartLogs = 'C:\\Users\\Demen\\PycharmProjects\\MusicBoxClientV2.\\TestLogs\\bubuka_launcher.log'
+pathRuntimeLogs = 'C:\\Users\\Demen\\PycharmProjects\\MusicBoxClientV2\\TestLogs\\bubuka.log'
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def getMachineStateJson():
+    data = {
+        "UUID": str(uuid.UUID(int=uuid.getnode())),
+        "machineState": [],
+        "password": "qwer",
+        "StartLogs": [],
+        "RuntimeLogs": [],
+    }
+    data['StartLogs'].append(readStartLogs(pathStartLogs))
+    data['RuntimeLogs'].append(readRuntimeLogs(pathRuntimeLogs))
+    data['machineState'].append(MachineState().__dict__)
+
+    data_json = json.dumps(data, ensure_ascii=False)
+    return data_json
+
+async def listen(url):
+    async with websockets.connect(url) as websocket:
+        while 1:
+            msg = await websocket.recv()
+            print(msg)
+            await websocket.send(getMachineStateJson())
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+asyncio.get_event_loop().run_until_complete(listen(url))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
