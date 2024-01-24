@@ -1,8 +1,12 @@
-import psutil
+import datetime
 
+import psutil
+import uuid
 
 class MachineState:
     def __init__(self):
+
+        self.UUID = str(uuid.UUID(int=uuid.getnode()))
         cpufreq = psutil.cpu_freq()
         self.physicalСores = f"{psutil.cpu_count(logical=False)}"
         self.totalCores = f"{psutil.cpu_count(logical=True)}"
@@ -28,6 +32,7 @@ class MachineState:
         self.webByteRecv = f"{getSize(net_io.bytes_recv)}"
         # температура только для linux
         self.temp = getTemp()
+        self.timeCreateMSK = str(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=3))))
 
 
 def getSize(bytes, suffix="B"):
@@ -39,7 +44,7 @@ def getSize(bytes, suffix="B"):
 
 
 def getTemp():
-    string = "";
+    string = ""
     if not hasattr(psutil, "sensors_temperatures"):
         return ("платформа не поддерживается")
     temps = psutil.sensors_temperatures()
